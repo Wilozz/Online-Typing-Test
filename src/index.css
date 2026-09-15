@@ -2,6 +2,6 @@
 @import url('https://googleapis.com');
 
 body {
-    background-color: var(--color-white);
+    background-color: var(--color-zinc-700);
     color: var(--color-zinc-100)
 }
