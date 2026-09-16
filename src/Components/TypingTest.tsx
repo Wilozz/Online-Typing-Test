@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react"
-import { useStopwatch } from "./Timer"
 
 type Quote = {
     Quote: string,
@@ -9,8 +8,15 @@ type Quote = {
     Category: string
 }
 
-export function TypingTest() {
-    const { elapsedTime, start, stop, reset } = useStopwatch()
+type TypingTestProps = {
+    start: () => void
+    stop: () => void
+    reset: () => void
+    elapsedTime: number
+    onFinish: (results: {wpm: number, accuracy : number}) => void
+}
+
+export function TypingTest({ start, stop, reset, elapsedTime, onFinish }: TypingTestProps) {
     const inputRef = useRef<HTMLInputElement>(null)
 
     const [typedText, setTypedText] = useState("")
@@ -53,6 +59,21 @@ export function TypingTest() {
         }
     }, [quotes])
 
+    function calculateWpm(typed: string, target: string, elapsedTime: number): number {
+        const typedWords = typed.split(" ")
+        const targetWords = target.split(" ")
+
+        let correctWords = 0
+        for (let i = 0; i < targetWords.length; i++) {
+            if (typedWords[i] === targetWords[i]) {
+                correctWords++
+            }
+        }
+
+        const minutes = elapsedTime / 1000 / 60
+        return correctWords / minutes
+    }
+
     function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         const newValue = event.target.value
 
@@ -62,6 +83,15 @@ export function TypingTest() {
 
         if (newValue.length >= targetText.length) {
             stop()
+
+            let correctChars = 0
+            for (let i = 0; i < targetText.length; i++) {
+                if (newValue[i] === targetText[i]) correctChars++
+            }
+            const accuracy = (correctChars / targetText.length) * 100
+            const wpm = calculateWpm(newValue, targetText, elapsedTime)
+
+            onFinish({ wpm, accuracy })
         }
 
         setTypedText(event.target.value)
@@ -90,7 +120,6 @@ export function TypingTest() {
             })}
 
             <input ref={inputRef} value={typedText} onChange={handleChange} autoFocus style={{ position: "absolute", opacity: 0}}/>
-            <p>{(elapsedTime / 1000).toFixed(1)}s</p>
         </div>
     )
 }
