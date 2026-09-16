@@ -1,4 +1,4 @@
-import { TypingTest } from "./Pages/TypingTest";
+import { TypingTest } from "./Components/TypingTest";
 
 export default function App() {
   return (

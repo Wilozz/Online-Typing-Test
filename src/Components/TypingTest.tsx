@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { useStopwatch } from "./Timer"
 
 type Quote = {
     Quote: string,
@@ -9,6 +10,7 @@ type Quote = {
 }
 
 export function TypingTest() {
+    const { elapsedTime, start, stop, reset } = useStopwatch()
     const inputRef = useRef<HTMLInputElement>(null)
 
     const [typedText, setTypedText] = useState("")
@@ -26,6 +28,16 @@ export function TypingTest() {
         })
     }, [])
 
+    function pickRandomQuote(quotes: Quote[]) {
+        const random = Math.floor(Math.random() * quotes.length)
+        const normalised = quotes[random].Quote
+            .replace(/[\u2018\u2019]/g, "'")
+            .replace(/[\u201C\u201D]/g, '"')
+        setTargetText(normalised)
+        setTypedText("")
+        reset()
+    }
+
     useEffect(() => {
         function handleKeyPress(event: KeyboardEvent) {
             if (event.key === "Tab") {
@@ -41,16 +53,17 @@ export function TypingTest() {
         }
     }, [quotes])
 
-    function pickRandomQuote(quotes: Quote[]) {
-        const random = Math.floor(Math.random() * quotes.length)
-        const normalised = quotes[random].Quote
-            .replace(/[\u2018\u2019]/g, "'")
-            .replace(/[\u201C\u201D]/g, '"')
-        setTargetText(normalised)
-        setTypedText("")
-    }
-
     function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const newValue = event.target.value
+
+        if (typedText === "" && newValue !== "") {
+            start()
+        }
+
+        if (newValue.length >= targetText.length) {
+            stop()
+        }
+
         setTypedText(event.target.value)
     }
 
@@ -77,6 +90,7 @@ export function TypingTest() {
             })}
 
             <input ref={inputRef} value={typedText} onChange={handleChange} autoFocus style={{ position: "absolute", opacity: 0}}/>
+            <p>{(elapsedTime / 1000).toFixed(1)}s</p>
         </div>
     )
 }
