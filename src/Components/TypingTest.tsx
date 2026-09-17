@@ -13,7 +13,7 @@ type TypingTestProps = {
     stop: () => void
     reset: () => void
     elapsedTime: number
-    onFinish: (results: {wpm: number, accuracy : number}) => void
+    onFinish: (results: {wpm: number, accuracy : number} | null) => void
 }
 
 export function TypingTest({ start, stop, reset, elapsedTime, onFinish }: TypingTestProps) {
@@ -41,6 +41,7 @@ export function TypingTest({ start, stop, reset, elapsedTime, onFinish }: Typing
             .replace(/[\u201C\u201D]/g, '"')
         setTargetText(normalised)
         setTypedText("")
+        onFinish(null)
         reset()
     }
 
@@ -74,9 +75,7 @@ export function TypingTest({ start, stop, reset, elapsedTime, onFinish }: Typing
         return correctWords / minutes
     }
 
-    function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const newValue = event.target.value
-
+    function processTypedText(newValue: string) {
         if (typedText === "" && newValue !== "") {
             start()
         }
@@ -94,7 +93,25 @@ export function TypingTest({ start, stop, reset, elapsedTime, onFinish }: Typing
             onFinish({ wpm, accuracy })
         }
 
-        setTypedText(event.target.value)
+        setTypedText(newValue)
+    }
+
+    function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+        processTypedText(event.target.value)
+    }
+
+    function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+        if (event.key === " ") {
+            event.preventDefault()
+
+            const nextSpaceIndex = targetText.indexOf(" ", typedText.length)
+            const newTypedText =
+                nextSpaceIndex === -1
+                    ? targetText
+                    : typedText.padEnd(nextSpaceIndex + 1, " ")
+
+            processTypedText(newTypedText)
+        }
     }
 
     return (
@@ -119,7 +136,7 @@ export function TypingTest({ start, stop, reset, elapsedTime, onFinish }: Typing
                 )
             })}
 
-            <input ref={inputRef} value={typedText} onChange={handleChange} autoFocus style={{ position: "absolute", opacity: 0}}/>
+            <input ref={inputRef} value={typedText} onChange={handleChange} onKeyDown={handleKeyDown} autoFocus style={{ position: "absolute", opacity: 0}}/>
         </div>
     )
 }

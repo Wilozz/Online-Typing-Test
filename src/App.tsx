@@ -19,10 +19,9 @@ export default function App() {
       </section>
 
       <section>
-        <p className="">{(elapsedTime/1000).toFixed(1)}s</p>
-
+        <p className="flex relative justify-center items-center -mt-100 text-9xl opacity-20">{(elapsedTime/1000).toFixed(1)}s</p>
           {results && (
-              <p>WPM: {results.wpm.toFixed(0)}, Accuracy: {results.accuracy.toFixed(0)}%</p>
+              <p className="flex relative justify-center mt-10">WPM: {results.wpm.toFixed(0)}, Accuracy: {results.accuracy.toFixed(0)}%</p>
           )}
       </section>
     </div>
