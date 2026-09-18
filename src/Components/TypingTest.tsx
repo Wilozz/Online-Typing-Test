@@ -23,6 +23,9 @@ export function TypingTest({ start, stop, reset, elapsedTime, onFinish }: Typing
     const [quotes, setQuotes] = useState<Quote[]>([])
     const [targetText, setTargetText] = useState("")
 
+    const targetWords = targetText.split(" ")
+    const typedWords = typedText.split(" ")
+
     function focusInput() {
         inputRef.current?.focus()
     }
@@ -80,14 +83,19 @@ export function TypingTest({ start, stop, reset, elapsedTime, onFinish }: Typing
             start()
         }
 
-        if (newValue.length >= targetText.length) {
+        const newTypedWords = newValue.split(" ")
+        const currIndex = newTypedWords.length - 1
+        const onLastWord = (currIndex === targetWords.length - 1)
+        const lastWordLength = targetWords[targetWords.length - 1].length
+
+        if (onLastWord && newTypedWords[currIndex].length >= lastWordLength) {
             stop()
 
-            let correctChars = 0
-            for (let i = 0; i < targetText.length; i++) {
-                if (newValue[i] === targetText[i]) correctChars++
+            let correctWords = 0
+            for (let i = 0; i < targetWords.length; i++) {
+                if (newTypedWords[i] === targetWords[i]) correctWords++
             }
-            const accuracy = (correctChars / targetText.length) * 100
+            const accuracy = (correctWords / targetWords.length) * 100
             const wpm = calculateWpm(newValue, targetText, elapsedTime)
 
             onFinish({ wpm, accuracy })
@@ -104,34 +112,42 @@ export function TypingTest({ start, stop, reset, elapsedTime, onFinish }: Typing
         if (event.key === " ") {
             event.preventDefault()
 
-            const nextSpaceIndex = targetText.indexOf(" ", typedText.length)
-            const newTypedText =
-                nextSpaceIndex === -1
-                    ? targetText
-                    : typedText.padEnd(nextSpaceIndex + 1, " ")
+            if (typedText === "" || typedText.endsWith(" " )) return
 
-            processTypedText(newTypedText)
+            processTypedText(typedText + " ")
         }
     }
 
     return (
-        <div onClick={focusInput}>
-            {targetText.split("").map((char, index) => {
-                const isTyped = index < typedText.length
-                const isCorrect = typedText[index] === char
-
-                let color = "black"
-                if (isTyped && isCorrect) {
-                    color = "blue"
-                } else if (isTyped && !isCorrect) {
-                    color = "red"
-                }
+        <div onClick={focusInput} className="max-w-2xl mx-auto text-center">
+            {targetWords.map((word, wordIndex) => {
+                const typedWord = typedWords[wordIndex] ?? ""
 
                 return (
-                    <span 
-                        key={index} 
-                        style={{ color: color}}>
-                        {char}
+                    <span key={wordIndex}>
+                        {word.split("").map((char, charIndex) => {
+                            const typedChar = typedWord[charIndex]
+                            const isTyped = typedChar !== undefined
+                            const isCorrect = typedChar === char
+
+                            let color = "black"
+                            if (isTyped && isCorrect) {
+                                color = "blue"
+                            } else if (isTyped && !isCorrect) {
+                                color = "red"
+                            }
+
+                            return <span key={charIndex} style={{ color }}>{char}</span>
+                        })}
+
+                        {typedWord.length > word.length &&
+                            typedWord.slice(word.length).split("").map((char, i) => (
+                                <span key={`overflow-${i}`} style={{ color: "red", opacity: 0.5 }}>
+                                    {char}
+                                </span>
+                            ))}
+                            
+                        {" "}
                     </span>
                 )
             })}
