@@ -7,23 +7,20 @@ export default function App() {
   const [results, setResults] = useState<{ wpm: Number, accuracy: Number } | null>(null)
 
   return (
-    <div>
-      <section className="flex items-center justify-center -mt-20 min-h-screen px-30">
-        <TypingTest 
-          start={start}
-          stop={stop} 
-          reset={reset} 
-          elapsedTime={elapsedTime}
-          onFinish={setResults} 
-        />
-      </section>
+    <div className="flex flex-col items-center justify-center min-h-screen px-30 gap-10">
+      <TypingTest 
+        start={start}
+        stop={stop} 
+        reset={reset} 
+        elapsedTime={elapsedTime}
+        onFinish={setResults} 
+      />
 
-      <section>
-        <p className="flex relative justify-center items-center -mt-100 text-9xl opacity-20">{(elapsedTime/1000).toFixed(1)}s</p>
-          {results && (
-              <p className="flex relative justify-center mt-10">WPM: {results.wpm.toFixed(0)}, Accuracy: {results.accuracy.toFixed(0)}%</p>
-          )}
-      </section>
+      <p className="text-9xl opacity-20">{(elapsedTime/1000).toFixed(1)}s</p>
+
+      {results && (
+          <p className="mt-4">WPM: {results.wpm.toFixed(0)}, Accuracy: {results.accuracy.toFixed(0)}%</p>
+      )}
     </div>
   )
 }

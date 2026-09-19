@@ -119,7 +119,7 @@ export function TypingTest({ start, stop, reset, elapsedTime, onFinish }: Typing
     }
 
     return (
-        <div onClick={focusInput} className="max-w-2xl mx-auto text-center">
+        <div onClick={focusInput} className="max-w-2xl mx-auto text-center break-words">
             {targetWords.map((word, wordIndex) => {
                 const typedWord = typedWords[wordIndex] ?? ""
 
