@@ -13,6 +13,7 @@
     "@neondatabase/serverless": "^1.1.0",
     "@tailwindcss/vite": "^4.3.3",
     "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "tailwindcss": "^4.3.3"
